@@ -2,11 +2,9 @@
 
 out vec4 color;
 
-uniform sampler2D ourTexture;
-
-
+uniform vec4 inputColor;
 
 void main()
 {
-    color = vec4(1.0, 1.0, 1.0, 1.0);
+    color = inputColor;
 }

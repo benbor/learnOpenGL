@@ -1,23 +1,14 @@
 package rocks.biankouski.runinfiregame.desktop.opengl.service;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GLUtil;
+import org.lwjgl.system.Configuration;
 
-import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
-import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
-import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_FORWARD_COMPAT;
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_PROFILE;
-import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
-import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
-import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
-import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
-import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
-import static org.lwjgl.glfw.GLFW.glfwInit;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
-import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
-import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import java.util.concurrent.TimeUnit;
+
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
@@ -33,8 +24,17 @@ public class Window {
     private long id;
 
     public Window() {
-        GLFWErrorCallback errorCallback;
-        glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
+
+        Configuration.DEBUG.set(true);
+//        Configuration.DEBUG_FUNCTIONS.set(true);
+        Configuration.DEBUG_LOADER.set(true);
+        Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
+        Configuration.DEBUG_STACK.set(true);
+
+        glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
+
+
+
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
@@ -48,6 +48,7 @@ public class Window {
 
         glfwDefaultWindowHints(); // Loads GLFW's default window settings
 
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         //Минорная
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -57,11 +58,14 @@ public class Window {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
+
         id = glfwCreateWindow(m_width, m_height, title, 0, 0); //Does the actual window creation
         if (id == 0) throw new RuntimeException("Failed to create window");
 
         glfwMakeContextCurrent(id); //glfwSwapInterval needs a context on the calling thread, otherwise will cause NO_CURRENT_CONTEXT error
         GL.createCapabilities(); //Will let lwjgl know we want to use this context as the
+        GLUtil.setupDebugMessageCallback(System.out);
+
         int width[] = new int[1];
         int height[] = new int[1];
         glfwGetFramebufferSize(id, width, height);
@@ -82,5 +86,20 @@ public class Window {
 
     public int getFrameHeight() {
         return frameHeight;
+    }
+
+    public boolean update() {
+
+        try {
+            TimeUnit.MILLISECONDS.sleep(10);
+//                System.out.println("Cycle" + (numberCycle++).toString());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        glfwSwapBuffers(id);
+
+        return !glfwWindowShouldClose(id);
     }
 }

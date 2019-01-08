@@ -1,6 +1,9 @@
 package rocks.biankouski.runinfiregame.desktop.opengl.service;
 
+import org.lwjgl.system.MemoryStack;
+
 import java.io.IOException;
+import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -19,6 +22,7 @@ import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
 import static org.lwjgl.opengl.GL20.glGetShaderiv;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
+import static org.lwjgl.system.MemoryStack.stackPush;
 
 /**
  * Created by borisb on 9/1/17.
@@ -63,18 +67,19 @@ public class ShaderProgram {
         String source = getShaderCode(path);
         glShaderSource(shader, source);
         glCompileShader(shader);
-        int[] resultBuffer = new int[1];
-        glGetShaderiv(shader, GL_COMPILE_STATUS, resultBuffer);
-        int result = resultBuffer[0];
+        try (MemoryStack stack = stackPush()) {
+            IntBuffer resultBuffer = stack.mallocInt(1);
+            glGetShaderiv(shader, GL_COMPILE_STATUS, resultBuffer);
+            int result = resultBuffer.get(0);
+            if (result == 0) {
+                String log = glGetShaderInfoLog(shader, 512);
+                System.out.print(log);
+                System.out.print(source);
+                System.exit(1);
+            }
 
-        if (result == 0) {
-            String log = glGetShaderInfoLog(shader, 512);
-            System.out.print(log);
-            System.out.print(source);
-            System.exit(1);
+            return shader;
         }
-
-        return shader;
     }
 
     private String getShaderCode (String path) {

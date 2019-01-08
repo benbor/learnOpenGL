@@ -5,30 +5,12 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
-import java.util.concurrent.TimeUnit;
-
-import rocks.biankouski.runinfiregame.desktop.opengl.service.Controller;
-import rocks.biankouski.runinfiregame.desktop.opengl.service.DI;
-import rocks.biankouski.runinfiregame.desktop.opengl.service.DrawableInterface;
-import rocks.biankouski.runinfiregame.desktop.opengl.service.Lighter;
-import rocks.biankouski.runinfiregame.desktop.opengl.service.Observer;
-import rocks.biankouski.runinfiregame.desktop.opengl.service.ShaderProgram;
-import rocks.biankouski.runinfiregame.desktop.opengl.service.Texture;
-import rocks.biankouski.runinfiregame.desktop.opengl.service.WoodenBox;
-import rocks.biankouski.runinfiregame.desktop.opengl.service.Window;
+import rocks.biankouski.runinfiregame.desktop.opengl.service.*;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
-import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glGetIntegerv;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Five {
 
@@ -61,22 +43,22 @@ public class Five {
 
     private void renderSquareViaUniform (Window window)  {
 
-        DrawableInterface lighter = new Lighter(new ShaderProgram("shaders/Five/_light_vertex.glsl", "shaders/Five/_light_fragment.glsl"));
-        DrawableInterface woodenBox = new WoodenBox(
-                new ShaderProgram("shaders/Four/vertex.glsl", "shaders/Four/fragment.glsl"),
-                new Texture("box.jpg")
-        );
+        Color4f lightColor = Color4f.white;
+        DrawableInterface lighter = new Lighter(lightColor);
+        DrawableInterface woodenBox = new ColoredBox(new Color4f(1.0f, 0.5f, 0.31f, 1f), lightColor);
 
 
         glEnable(GL_DEPTH_TEST);
 
-        while (!glfwWindowShouldClose(window.getId())) {
+        while (window.update()) {
             glfwPollEvents();
             float deltaTime = (float) glfwGetTime();
 
             observer.update(deltaTime);
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
             camera.update();
 
             Matrix4 lighterTrans = new Matrix4(camera.combined);
@@ -87,15 +69,6 @@ public class Five {
             cubeTrans.translate(new Vector3(-1.0f, -1.0f, -1.0f)).rotate(new Vector3(0.5f, 1f, 0f), deltaTime * 5f).scale(1.5f,0.5f, 1f);
             woodenBox.draw(cubeTrans);
 
-            try {
-                TimeUnit.MILLISECONDS.sleep(10);
-//                System.out.println("Cycle" + (numberCycle++).toString());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-
-            glfwSwapBuffers(window.getId());
         }
     }
 }

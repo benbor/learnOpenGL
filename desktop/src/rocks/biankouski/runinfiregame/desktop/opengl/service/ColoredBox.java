@@ -2,7 +2,9 @@ package rocks.biankouski.runinfiregame.desktop.opengl.service;
 
 import com.badlogic.gdx.math.Matrix4;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
@@ -16,24 +18,30 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
  * Created by boris on 9/19/17.
  */
 
-public class Lighter implements DrawableInterface{
+public class ColoredBox implements DrawableInterface{
     private final ShaderProgram shaderProgram;
+    private final Color4f objectColor;
+    private final Color4f lighterColor;
+
 
     private int VAO;
     private int VBO;
     private final int locationOfTransform;
     private final int locationOfInputColor;
-    private final Color4f color;
+    private final int locationOfLightColor;
 
-    public Lighter(Color4f color) {
-        this.color = color;
+    public ColoredBox(Color4f objectColor, Color4f lighterColor) {
+        this.objectColor = objectColor;
+        this.lighterColor = lighterColor;
 
-        this.shaderProgram = new ShaderProgram("shaders/Five/_light_vertex.glsl", "shaders/Five/_light_fragment.glsl");
+
+        shaderProgram = new ShaderProgram("shaders/Five/vertex.glsl", "shaders/Five/fragment.glsl");
 
         locationOfTransform = glGetUniformLocation(shaderProgram.getShaderProgramId(), "transform");
         locationOfInputColor = glGetUniformLocation(shaderProgram.getShaderProgramId(), "inputColor");
+        locationOfLightColor = glGetUniformLocation(shaderProgram.getShaderProgramId(), "lightColor");
 
-        float vertices[] = {
+        float[] vertices = {
                 -0.5f, -0.5f, -0.5f,
                 0.5f, -0.5f, -0.5f,
                 0.5f,  0.5f, -0.5f,
@@ -95,11 +103,13 @@ public class Lighter implements DrawableInterface{
 
     public void draw(Matrix4 trans) {
 
-
         glUseProgram(shaderProgram.getShaderProgramId());
         glBindVertexArray(VAO);
-        glUniform4fv(locationOfInputColor, color.value());
+
+        glUniform4fv(locationOfInputColor, objectColor.value());
+        glUniform4fv(locationOfLightColor, lighterColor.value());
         glUniformMatrix4fv(locationOfTransform, false, trans.val);
+
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glBindVertexArray(0);
