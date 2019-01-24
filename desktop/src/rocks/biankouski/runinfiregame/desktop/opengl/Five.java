@@ -2,10 +2,14 @@ package rocks.biankouski.runinfiregame.desktop.opengl;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
+import org.javatuples.Pair;
 import rocks.biankouski.runinfiregame.desktop.opengl.service.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
@@ -44,30 +48,39 @@ public class Five {
     private void renderSquareViaUniform (Window window)  {
 
         Color4f lightColor = Color4f.white;
-        DrawableInterface lighter = new Lighter(lightColor);
-        DrawableInterface woodenBox = new ColoredBox(new Color4f(1.0f, 0.5f, 0.31f, 1f), lightColor);
+        Lighter lighter = new Lighter(lightColor);
+
+
+        List<ColoredBox> cubs = Arrays.asList(
+                new ColoredBox(new Vector3(2.0f, 0.0f, 2.0f), new Color4f(1.0f, 0.5f, 0.31f, 1f), lighter),
+                new ColoredBox(new Vector3(0.0f, 0.0f, -5.0f), new Color4f(0.2f, 0.2f, 0.2f, 1f), lighter)
+        );
 
 
         glEnable(GL_DEPTH_TEST);
 
+        float lastTime = 0f;
+
         while (window.update()) {
             glfwPollEvents();
-            float deltaTime = (float) glfwGetTime();
+            float newTime = (float) glfwGetTime();
+            float deltaTime = newTime - lastTime;
+            lastTime = newTime;
 
             observer.update(deltaTime);
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClearColor(0.1f, 0.1f, 0.5f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
             camera.update();
 
-            Matrix4 lighterTrans = new Matrix4(camera.combined);
-            lighterTrans.translate(new Vector3(1.0f, 1.0f, 1.0f)).scale(0.5f,0.5f, 1f);
-            lighter.draw(lighterTrans);
+            // draw lighter
+            lighter.draw(camera.combined, deltaTime);
 
-            Matrix4 cubeTrans = new Matrix4(camera.combined);
-            cubeTrans.translate(new Vector3(-1.0f, -1.0f, -1.0f)).rotate(new Vector3(0.5f, 1f, 0f), deltaTime * 5f).scale(1.5f,0.5f, 1f);
-            woodenBox.draw(cubeTrans);
+            //draw cubes
+            for (ColoredBox cube : cubs) {
+                cube.draw(camera.combined, deltaTime);
+            }
 
         }
     }

@@ -7,5 +7,5 @@ import com.badlogic.gdx.math.Matrix4;
  */
 
 public interface DrawableInterface {
-    void draw(Matrix4 trans);
+    void draw(Matrix4 cameraTranslate, float deltaTime);
 }

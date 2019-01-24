@@ -1,23 +1,9 @@
 package rocks.biankouski.runinfiregame.desktop.opengl.service;
 
-import org.lwjgl.glfw.GLFWCursorPosCallbackI;
 
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_M;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import static org.lwjgl.glfw.GLFW.GLFW_REPEAT;
-import static org.lwjgl.glfw.GLFW.glfwGetInputMode;
-import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
-import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+import java.util.*;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Created by boris on 9/17/17.
@@ -25,7 +11,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 
 public class Controller {
     private final Window window;
-    private final boolean[] pressedKeys = new boolean[512];
+    private final Set<Integer> pressedKeys = new HashSet<>();
 
     private float lastMouseX = 0f;
     private float lastMouseY = 0f;
@@ -33,7 +19,6 @@ public class Controller {
     public Controller(Window window) {
         this.window = window;
 
-        //glfwSetInputMode(window.getId(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetKeyCallback(window.getId(), this::keyCallback);
         glfwSetCursorPosCallback(window.getId(), this::mouseCallback);
         glfwSetMouseButtonCallback(window.getId(), this::mouseButtonCallback);
@@ -54,13 +39,17 @@ public class Controller {
     }
 
     private void keyCallback(long window1, int keyCode, int scancode, int action, int mods) {
+        if (GLFW_KEY_UNKNOWN == keyCode) {
+            return;
+        }
+
         switch (action) {
             case GLFW_PRESS:
             case GLFW_REPEAT:
-                pressedKeys[keyCode] = true;
+                pressedKeys.add(keyCode);
                 break;
             case GLFW_RELEASE:
-                pressedKeys[keyCode] = false;
+                pressedKeys.remove(keyCode);
                 break;
             default:
                 throw new RuntimeException();
@@ -81,7 +70,7 @@ public class Controller {
     }
 
     public boolean isPressed(int KeyCode) {
-        return pressedKeys[KeyCode];
+        return pressedKeys.contains(KeyCode);
     }
 
 

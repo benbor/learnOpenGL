@@ -24,7 +24,7 @@ public class Observer {
     private float pitch = 0f;
 
     private float sensitive = 0.04f;
-    private float movementSensitive = 0.02f;
+    private float movementSensitive = 5f;
 
 
     public Observer(Camera camera, Controller controller) {

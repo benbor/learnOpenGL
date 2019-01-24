@@ -9,7 +9,7 @@ import org.lwjgl.system.Configuration;
 import java.util.concurrent.TimeUnit;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Created by borisb on 9/1/17.
