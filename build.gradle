@@ -1,10 +1,14 @@
+
+
 buildscript {
     
+
 
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { 
+            url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
     }
     dependencies {
@@ -22,7 +26,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "RunInFire"
-        gdxVersion = '1.9.6'
+        gdxVersion = '1.9.9'
         roboVMVersion = '2.3.1'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
@@ -46,6 +50,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         compile "org.javatuples:javatuples:1.2"
+        file "libs/lwjglx-debug-1.0.0.jars"
     }
 }
 

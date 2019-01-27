@@ -52,8 +52,8 @@ public class Five {
 
 
         List<ColoredBox> cubs = Arrays.asList(
-                new ColoredBox(new Vector3(2.0f, 0.0f, 2.0f), new Color4f(1.0f, 0.5f, 0.31f, 1f), lighter),
-                new ColoredBox(new Vector3(0.0f, 0.0f, -5.0f), new Color4f(0.2f, 0.2f, 0.2f, 1f), lighter)
+                new ColoredBox(new Vector3(2.0f, 0.0f, 2.0f), new Color4f(1.0f, 0.5f, 0.31f, 1f), lighter, camera),
+                new ColoredBox(new Vector3(0.0f, 0.0f, -5.0f), new Color4f(0.2f, 0.2f, 0.2f, 1f), lighter, camera)
         );
 
 
@@ -66,6 +66,12 @@ public class Five {
             float newTime = (float) glfwGetTime();
             float deltaTime = newTime - lastTime;
             lastTime = newTime;
+
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             observer.update(deltaTime);
             glClearColor(0.1f, 0.1f, 0.5f, 1.0f);

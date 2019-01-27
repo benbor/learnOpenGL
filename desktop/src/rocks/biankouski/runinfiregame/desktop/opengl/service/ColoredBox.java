@@ -1,5 +1,6 @@
 package rocks.biankouski.runinfiregame.desktop.opengl.service;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
@@ -24,6 +25,7 @@ public class ColoredBox implements DrawableInterface{
     private final Vector3 worldPosition;
     private final Color4f objectColor;
     private final Lighter lighter;
+    private final Camera camera;
     private float lifetime;
 
 
@@ -34,12 +36,14 @@ public class ColoredBox implements DrawableInterface{
     private final int locationOfInputColor;
     private final int locationOfLightColor;
     private final int locationOfLightPosition;
+    private final int locationOfViewPosition;
 
-    public ColoredBox(Vector3 position, Color4f objectColor, Lighter lighter) {
+    public ColoredBox(Vector3 position, Color4f objectColor, Lighter lighter, Camera camera) {
 
         this.worldPosition = position;
         this.objectColor = objectColor;
         this.lighter = lighter;
+        this.camera = camera;
 
         lifetime = 0f;
 
@@ -50,6 +54,7 @@ public class ColoredBox implements DrawableInterface{
         locationOfInputColor = glGetUniformLocation(shaderProgram.getShaderProgramId(), "inputColor");
         locationOfLightColor = glGetUniformLocation(shaderProgram.getShaderProgramId(), "lightColor");
         locationOfLightPosition = glGetUniformLocation(shaderProgram.getShaderProgramId(), "lightPosition");
+        locationOfViewPosition = glGetUniformLocation(shaderProgram.getShaderProgramId(), "viewPosition");
 
         float[] vertices = {
                 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -116,9 +121,10 @@ public class ColoredBox implements DrawableInterface{
     public void draw(Matrix4 cameraTranslate, float deltaTime) {
 
         lifetime += deltaTime;
-//        worldPosition.rotate(new Vector3(0f, 1f, 0f), deltaTime * 10f);
+        lifetime = 0;
+
+
         Matrix4 model = new Matrix4().translate(worldPosition).rotate(new Vector3(0f, 1f, 0f), lifetime * 10f);
-//        Matrix4 model = new Matrix4().translate(worldPosition);//.rotate(new Vector3(0f, 1f, 0f), deltaTime * 100f);
 
 
         glUseProgram(shaderProgram.getShaderProgramId());
@@ -128,7 +134,9 @@ public class ColoredBox implements DrawableInterface{
         glUniform3fv(locationOfLightColor, lighter.getColor().value3());
 
         Vector3 lighterP = lighter.getPosition();
-        glUniform3fv(locationOfLightPosition, new float[] {lighterP.x, lighterP.y, lighterP.z});
+        glUniform3f(locationOfLightPosition, lighterP.x, lighterP.y, lighterP.z);
+        Vector3 viewP = camera.position;
+        glUniform3f(locationOfViewPosition, viewP.x, viewP.y, viewP.z);
 
         glUniformMatrix4fv(locationOfTransform, false, cameraTranslate.val);
         glUniformMatrix4fv(locationOfModel, false, model.val);

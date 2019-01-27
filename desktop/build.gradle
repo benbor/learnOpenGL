@@ -4,7 +4,7 @@ sourceCompatibility = 8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 project.ext.mainClassName = "rocks.biankouski.runinfiregame.desktop.DesktopLauncher"
-project.ext.assetsDir = new File("../android/assets");
+project.ext.assetsDir = new File("../assets")
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
@@ -21,6 +21,8 @@ task debug(dependsOn: classes, type: JavaExec) {
     workingDir = project.assetsDir
     ignoreExitValue = true
     debug = true
+    standardOutput = System.out
+    errorOutput = System.err
 }
 
 task dist(type: Jar) {

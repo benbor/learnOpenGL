@@ -12,8 +12,9 @@ import static org.lwjgl.opengl.GL11.glGetString;
 public class DesktopLauncher {
 
     public static void main(String[] arg) {
+        System.out.println("Main started successfully");
         System.setProperty("java.awt.headless", "true");
-
+//
         GdxNativesLoader.load();
 
 
