@@ -121,11 +121,10 @@ public class ColoredBox implements DrawableInterface{
     public void draw(Matrix4 cameraTranslate, float deltaTime) {
 
         lifetime += deltaTime;
-        lifetime = 0;
+//        lifetime = 0;
 
 
         Matrix4 model = new Matrix4().translate(worldPosition).rotate(new Vector3(0f, 1f, 0f), lifetime * 10f);
-
 
         glUseProgram(shaderProgram.getShaderProgramId());
         glBindVertexArray(VAO);
